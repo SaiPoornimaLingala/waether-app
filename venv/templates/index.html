@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Weather App</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+        }
+        .container {
+            width: 80%;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .info-btn {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+        .info-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            justify-content: center;
+            align-items: center;
+        }
+        .info-content {
+            background: white;
+            padding: 20px;
+            border-radius: 5px;
+            width: 80%;
+            max-width: 500px;
+        }
+        .close-btn {
+            background: #dc3545;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            cursor: pointer;
+        }
+        .weather-icon {
+            font-size: 50px;
+        }
+        .weather-img {
+            width: 100px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Weather App</h1>
+        <form method="post">
+            <input type="text" name="city" placeholder="Enter city" required>
+            <button type="submit">Get Weather</button>
+        </form>
+        <button onclick="getLocation()">Get Weather for My Location</button>
+        <hr>
+        {% if weather_data %}
+            <h2>Current Weather in {{ weather_data.name }}</h2>
+            <img class="weather-img" src="http://openweathermap.org/img/wn/{{ weather_data.weather[0].icon }}@2x.png" alt="{{ weather_data.weather[0].description }}">
+            <p>Temperature: {{ weather_data.main.temp }}°C</p>
+            <p>Weather: {{ weather_data.weather[0].description }}</p>
+            <p>Humidity: {{ weather_data.main.humidity }}%</p>
+            <p>Wind Speed: {{ weather_data.wind.speed }} m/s</p>
+            <hr>
+            <h3>5-Day Forecast</h3>
+            {% for day in forecast_data.list %}
+                <p>Date: {{ day.dt_txt }}</p>
+                <img class="weather-img" src="http://openweathermap.org/img/wn/{{ day.weather[0].icon }}@2x.png" alt="{{ day.weather[0].description }}">
+                <p>Temperature: {{ day.main.temp }}°C</p>
+                <p>Weather: {{ day.weather[0].description }}</p>
+                <hr>
+            {% endfor %}
+        {% elif weather_data is not none %}
+            <p>City not found. Please try again.</p>
+        {% endif %}
+        <button class="info-btn" onclick="showInfo()">Info</button>
+        <div id="info-modal" class="info-modal">
+            <div class="info-content">
+                <h2>About PM Accelerator</h2>
+                <p>The PM Accelerator is dedicated to providing innovative solutions and technologies to advance project management practices and enhance operational efficiencies. Our expertise spans a wide range of industries and we are committed to delivering high-quality, scalable solutions.</p>
+                <button class="close-btn" onclick="hideInfo()">Close</button>
+            </div>
+        </div>
+        <footer>
+            <p>Developed by Sai Poornima Lingala</p>
+        </footer>
+    </div>
+    <script>
+        function showInfo() {
+            document.getElementById('info-modal').style.display = 'flex';
+        }
+        function hideInfo() {
+            document.getElementById('info-modal').style.display = 'none';
+        }
+        function getLocation() {
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(showWeatherByLocation);
+            } else {
+                alert("Geolocation is not supported by this browser.");
+            }
+        }
+        function showWeatherByLocation(position) {
+            const lat = position.coords.latitude;
+            const lon = position.coords.longitude;
+            fetch(`/location?lat=${lat}&lon=${lon}`)
+                .then(response => response.json())
+                .then(data => {
+                    document.querySelector('body').innerHTML += `
+                        <h2>Current Weather for Your Location</h2>
+                        <img class="weather-img" src="http://openweathermap.org/img/wn/${data.weather[0].icon}@2x.png" alt="${data.weather[0].description}">
+                        <p>Temperature: ${data.main.temp}°C</p>
+                        <p>Weather: ${data.weather[0].description}</p>
+                        <p>Humidity: ${data.main.humidity}%</p>
+                        <p>Wind Speed: ${data.wind.speed} m/s</p>
+                    `;
+                });
+        }
+    </script>
+</body>
+</html>
