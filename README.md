@@ -21,7 +21,7 @@ This Weather App provides users with the current weather for a city, a 5-day for
 
 ## Setup Instructions
 
-1. Clone the Repository: git clone (https://github.com/SaiPoornimaLingala/weather-app.git)
+1. Clone the Repository: git clone https://github.com/SaiPoornimaLingala/weather-app.git
 2. Navigate to the Project Directory: cd weather-app
 3. Install Dependencies: pip install flask requests
 4. Add Your API Key: Open app.py in a text editor and Replace 'YOUR_API_KEY' with your OpenWeatherMap API key in the following
